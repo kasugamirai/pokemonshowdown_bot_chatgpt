@@ -1,0 +1,1 @@
+# pokemonshowdown_bot_chatgpt
