@@ -9,8 +9,8 @@ import (
 
 const (
 	server   = "sim.smogon.com:8000"
-	username = "_"
-	password = "_"
+	username = "-"
+	password = "-"
 	avatar   = "dawn"
 	room     = "chinese"
 )
@@ -22,10 +22,9 @@ func main() {
 	}
 	defer conn.Close()
 
-	go showdown.ReadMessages(conn)
-
 	showdown.Login(conn, username, password, avatar)
 	showdown.JoinRoom(conn, room)
+	go showdown.ReadMessages(conn, room)
 
 	for {
 		time.Sleep(1 * time.Minute)

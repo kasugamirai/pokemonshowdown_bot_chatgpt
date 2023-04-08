@@ -5,8 +5,10 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/gorilla/websocket"
+	"xy.com/pokemonshowdownbot/chatgpt"
 )
 
 var dialer = websocket.Dialer{
@@ -19,7 +21,7 @@ func ConnectToServer(server string) (*websocket.Conn, error) {
 	return conn, err
 }
 
-func ReadMessages(conn *websocket.Conn) {
+func ReadMessages(conn *websocket.Conn, room string) {
 	for {
 		messageType, message, err := conn.ReadMessage()
 		if err != nil {
@@ -27,5 +29,31 @@ func ReadMessages(conn *websocket.Conn) {
 			return
 		}
 		fmt.Printf("%d: %s\n", messageType, message)
+		msg := string(message)
+		parts := strings.Split(msg, "|")
+		if len(parts) > 4 && IsStaff(parts[3]) && strings.HasPrefix(parts[4], ".prompt") {
+			response, err := chatgpt.ChatWithGPT(parts[4][7:])
+			if err != nil {
+				log.Println("Error ChatWithGPT message:", err)
+				return
+			}
+			if len(response) < 218 {
+				conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("%s|%s\n", room, response)))
+			} else {
+				conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("%s|%s\n", room, "!code "+response)))
+			}
+
+		}
 	}
+}
+
+func IsStaff(username string) bool {
+	auth := [3]string{"@", "#", "~"}
+	for _, a := range auth {
+		if strings.HasPrefix(username, a) {
+			return true
+		}
+
+	}
+	return false
 }
