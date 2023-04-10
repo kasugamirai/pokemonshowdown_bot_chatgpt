@@ -1,3 +1,4 @@
+// Package chatgpt provides an interface to interact with OpenAI's GPT-3.5-turbo model.
 package chatgpt
 
 import (
@@ -10,7 +11,9 @@ import (
 )
 
 const OpenAIAPIURL = "https://api.openai.com/v1/chat/completions"
+const model = "gpt-3.5-turbo"
 
+// Response represents the structure of the response from the OpenAI API.
 type Response struct {
 	Choices []struct {
 		Message struct {
@@ -19,16 +22,20 @@ type Response struct {
 	} `json:"choices"`
 }
 
+// Message is a structure representing a message sent to the API.
 type Message struct {
 	Role    string `json:"role"`
 	Content string `json:"content"`
 }
 
+// ChatCompletionRequest is the structure of the request sent to the OpenAI API.
 type ChatCompletionRequest struct {
 	Model    string    `json:"model"`
 	Messages []Message `json:"messages"`
 }
 
+// ChatWithGPT sends a prompt to the GPT-3.5-turbo model and returns its response as a string.
+// It returns an error if there are any issues during the process.
 func ChatWithGPT(prompt string) (string, error) {
 	apiKey := os.Getenv("OPENAI_API_KEY")
 	if apiKey == "" {
@@ -41,7 +48,7 @@ func ChatWithGPT(prompt string) (string, error) {
 		},
 	}
 
-	requestBody := &ChatCompletionRequest{Model: "gpt-3.5-turbo", Messages: messages}
+	requestBody := &ChatCompletionRequest{Model: model, Messages: messages}
 	jsonBody, err := json.Marshal(requestBody)
 	if err != nil {
 		return "", err

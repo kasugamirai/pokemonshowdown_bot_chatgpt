@@ -9,8 +9,8 @@ import (
 
 const (
 	server   = "sim.smogon.com:8000"
-	username = "-"
-	password = "-"
+	username = "your_username"
+	password = "your_password"
 	avatar   = "dawn"
 	room     = "chinese"
 )
