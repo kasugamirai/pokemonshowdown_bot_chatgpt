@@ -38,9 +38,9 @@ func ReadMessages(conn *websocket.Conn, room string) {
 				return
 			}
 			if len(response) < 218 {
-				conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("%s|%s\n", room, response)))
+				SendMessage(conn, room, response)
 			} else {
-				conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("%s|%s\n", room, "!code "+response)))
+				SendMessage(conn, room, "!code "+response)
 			}
 
 		}
@@ -56,4 +56,9 @@ func IsStaff(username string) bool {
 
 	}
 	return false
+}
+
+func SendMessage(conn *websocket.Conn, room, message string) {
+	message = strings.ReplaceAll(message, "\n", "")
+	conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("%s|%s\n", room, message)))
 }
