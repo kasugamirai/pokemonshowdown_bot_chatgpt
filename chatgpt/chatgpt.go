@@ -7,11 +7,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
-)
 
-const OpenAIAPIURL = "https://api.openai.com/v1/chat/completions"
-const model = "gpt-3.5-turbo"
+	"xy.com/pokemonshowdownbot/config"
+)
 
 // Response represents the structure of the response from the OpenAI API.
 type Response struct {
@@ -37,7 +35,9 @@ type ChatCompletionRequest struct {
 // ChatWithGPT sends a prompt to the GPT-3.5-turbo model and returns its response as a string.
 // It returns an error if there are any issues during the process.
 func ChatWithGPT(prompt string) (string, error) {
-	apiKey := os.Getenv("OPENAI_API_KEY")
+	var OpenAIAPIURL = config.Instance.Chatgpt.OpenAIAPIURL
+	var model = config.Instance.Chatgpt.Model
+	var apiKey = config.Instance.Chatgpt.OPENAI_API_KEY
 	if apiKey == "" {
 		return "", fmt.Errorf("error: OPENAI_API_KEY environment variable not set")
 	}
