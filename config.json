@@ -2,14 +2,14 @@
     "chatgpt":{
         "OpenAIAPIURL" : "https://api.openai.com/v1/chat/completions",
         "model" : "gpt-3.5-turbo",
-        "OPENAI_API_KEY" : "-"
+        "OPENAI_API_KEY" : ""
     },
 
     "pokemonshowdown" : {
         "server" : "sim.smogon.com:8000",
-        "username" : "-",
-        "password" : "-",
-        "avatar" : "-",
+        "username" : "",
+        "password" : "",
+        "avatar" : "dawn",
         "room" : "chinese"
     },
 
