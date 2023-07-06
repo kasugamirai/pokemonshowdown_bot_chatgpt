@@ -44,7 +44,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "./pokemonshowdownBot && ./config.json"
+          source: "./pokemonshowdownBot"
           target: "/pokemonshowdown"
 
       - name: Execute remote ssh commands
