@@ -1,0 +1,60 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.20.3
+
+      - name: Build
+        run: go build -o pokemonshowdownBot
+
+      - name: Check and stop running application
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: "pkill pokemonshowdownBot || true"
+
+      - name: Check and delete existing application
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: "test -f /pokemonshowdown/pokemonshowdownBot && rm -rf /pokemonshowdown/* || true"
+
+
+      - name: Copy backend file via ssh
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "./pokemonshowdownBot && ./config.json"
+          target: "/pokemonshowdown"
+
+      - name: Execute remote ssh commands
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            export BARD_API_KEY=${{ secrets.BARD_API_KEY }}
+            export POKEMONSHOWDOWN_PASSWORD=${{ secrets.POKEMONSHOWDOWN_PASSWORD }}
+            export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+            cd /pokemonshowdown && setsid ./pokemonshowdownBot > pokemonshowdownBot.log 2>&1 &

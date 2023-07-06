@@ -8,7 +8,6 @@ import (
 )
 
 var (
-	// Instance of Config struct, accessible through the package
 	Instance Config
 )
 
@@ -33,7 +32,6 @@ type chatgpt struct {
 }
 
 func LoadConfig(Path string) {
-	// Load the configuration file
 	configFile, err := os.Open(Path)
 	if err != nil {
 		log.Printf("Unable to open config file: %v, using defaults.", err)
@@ -41,17 +39,23 @@ func LoadConfig(Path string) {
 	}
 	defer configFile.Close()
 
-	// Read the configuration file
 	bytes, err := io.ReadAll(configFile)
 	if err != nil {
 		log.Printf("Unable to read config file: %v, using defaults.", err)
 		return
 	}
 
-	// Unmarshal the JSON configuration into Config struct
 	err = json.Unmarshal(bytes, &Instance)
 	if err != nil {
 		log.Printf("Unable to parse config file: %v, using defaults.", err)
 		return
+	}
+
+	// get pokemonshowdown password and OpenAI API key from environment variables
+	Instance.Pokemonshowdown.Password = os.Getenv("POKEMONSHOWDOWN_PASSWORD")
+	Instance.Chatgpt.OPENAI_API_KEY = os.Getenv("OPENAI_API_KEY")
+
+	if Instance.Pokemonshowdown.Password == "" || Instance.Chatgpt.OPENAI_API_KEY == "" {
+		log.Println("Some environment variables are not set. Make sure to set POKEMONSHOWDOWN_PASSWORD and OPENAI_API_KEY.")
 	}
 }

@@ -40,7 +40,7 @@ func ReadMessages(conn *websocket.Conn) {
 }
 
 func IsStaff(username string) bool {
-	auth := [3]string{"@", "#", "~"}
+	auth := [5]string{"+", "%", "@", "#", "~"}
 	for _, a := range auth {
 		if strings.HasPrefix(username, a) {
 			return true
