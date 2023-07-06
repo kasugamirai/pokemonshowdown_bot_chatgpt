@@ -63,7 +63,4 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            export BARD_API_KEY=${{ secrets.BARD_API_KEY }}
-            export POKEMONSHOWDOWN_PASSWORD=${{ secrets.POKEMONSHOWDOWN_PASSWORD }}
-            export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
-            cd /pokemonshowdown && setsid ./pokemonshowdownBot > pokemonshowdownBot.log 2>&1 &
+            cd /pokemonshowdown && setsid sh -c 'export BARD_API_KEY=${{ secrets.BARD_API_KEY }}; export POKEMONSHOWDOWN_PASSWORD=${{ secrets.POKEMONSHOWDOWN_PASSWORD }}; export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}; ./pokemonshowdownBot > pokemonshowdownBot.log 2>&1' &
