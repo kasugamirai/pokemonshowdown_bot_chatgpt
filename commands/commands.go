@@ -4,6 +4,7 @@ import (
 	"log"
 	"strings"
 
+	"xy.com/pokemonshowdownbot/bard"
 	"xy.com/pokemonshowdownbot/chatgpt"
 	"xy.com/pokemonshowdownbot/database"
 	"xy.com/pokemonshowdownbot/models"
@@ -17,6 +18,19 @@ func Prompt(msg string) (string, error) {
 	response, err := chatgpt.ChatWithGPT(msg)
 	if err != nil {
 		log.Println("Error connect to ChatWithGPT:", err)
+		return "", err
+	}
+	if len(response) < 218 {
+		return response, nil
+	} else {
+		return "!code " + response, nil
+	}
+}
+
+func Bard(msg string) (string, error) {
+	response, err := bard.GenerateTextResponse(msg)
+	if err != nil {
+		log.Println("Error connect to bard:", err)
 		return "", err
 	}
 	if len(response) < 218 {
@@ -50,6 +64,7 @@ func FindStickerByName(msg string) (string, error) {
 
 func LoadCommands() {
 	CommandsMap = map[string]HandlerFunc{
+		"bard": Bard,
 		"p":    Prompt,
 		"add":  AddSticker,
 		"find": FindStickerByName,
