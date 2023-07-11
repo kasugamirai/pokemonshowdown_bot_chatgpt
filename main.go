@@ -8,6 +8,8 @@ import (
 	"xy.com/pokemonshowdownbot/config"
 	"xy.com/pokemonshowdownbot/database"
 	"xy.com/pokemonshowdownbot/showdown"
+
+	"github.com/gorilla/websocket"
 )
 
 func main() {
@@ -28,9 +30,27 @@ func main() {
 	}
 	defer conn.Close()
 
+	// Set the Ping handler
+	conn.SetPingHandler(func(string) error {
+		conn.WriteMessage(websocket.PongMessage, []byte{})
+		return nil
+	})
+
 	showdown.Login(conn, ps.Username, ps.Password, ps.Avatar)
 	showdown.JoinRoom(conn, ps.Room)
+
+	// Start a goroutine to read messages
 	go showdown.ReadMessages(conn)
+
+	// Start a goroutine to send Ping messages periodically
+	go func() {
+		for {
+			time.Sleep(5 * time.Minute)
+			if err := conn.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
+				return
+			}
+		}
+	}()
 
 	for {
 		time.Sleep(1 * time.Minute)
