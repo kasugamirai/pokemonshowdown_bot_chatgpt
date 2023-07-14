@@ -22,31 +22,30 @@ func main() {
 	// Load commands
 	commands.LoadCommands()
 
-	// Infinite loop to keep the program running
+	// Auto reconnect loop
 	for {
-		// Connect to server
 		conn, err := showdown.ConnectToServer(ps.Server)
 		if err != nil {
 			log.Println("Error connecting to the server:", err)
-			time.Sleep(5 * time.Second) // Wait for 5 seconds before retrying
+			time.Sleep(5 * time.Second) // Wait for 5 seconds before retry
 			continue
 		}
+
+		// If we reach here, we are connected
+		defer conn.Close()
 
 		showdown.Login(conn, ps.Username, ps.Password, ps.Avatar)
 		showdown.JoinRoom(conn, ps.Room)
 
-		// Loop to read messages
-		for {
-			_, _, err := conn.ReadMessage()
-			if err != nil {
-				log.Println("Error reading message, lost connection to the server:", err)
-				conn.Close() // Close the connection before retrying
-				break
-			}
+		var done = make(chan bool)
 
-			// Process the message...
-		}
+		// Read messages in a separate goroutine to avoid blocking
+		go func() {
+			showdown.ReadMessages(conn)
+			done <- true
+		}()
 
-		time.Sleep(5 * time.Second) // Wait for 5 seconds before retrying
+		// Wait until the ReadMessages function finishes running
+		<-done
 	}
 }
