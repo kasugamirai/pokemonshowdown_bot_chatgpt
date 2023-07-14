@@ -32,21 +32,17 @@ func ReadMessages(conn *websocket.Conn) {
 		msg := string(message)
 		parts := strings.Split(msg, "|")
 		if len(parts) > 4 && parts[4][0] == '.' && IsStaff(parts[3]) {
-			processCommand(conn, parts)
-		}
-	}
-}
-
-func processCommand(conn *websocket.Conn, parts []string) {
-	for s, fn := range commands.CommandsMap {
-		if strings.HasPrefix(parts[4], "."+s) {
-			res, err := fn(parts[4][len(s)+2:])
-			if err != nil {
-				log.Println(err)
-				continue
+			for s, fn := range commands.CommandsMap {
+				if strings.HasPrefix(parts[4], "."+s) {
+					res, err := fn(parts[4][len(s)+2:])
+					if err != nil {
+						log.Println(err)
+						continue
+					}
+					SendMessage(conn, parts[0][1:len(parts[0])-1], res)
+					break
+				}
 			}
-			SendMessage(conn, parts[0][1:len(parts[0])-1], res)
-			break
 		}
 	}
 }
