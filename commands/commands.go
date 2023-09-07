@@ -62,11 +62,26 @@ func FindStickerByName(msg string) (string, error) {
 	return "/raw " + "<img src=\"" + URL.URL + "\" height=\"100\">" + "<br>", nil
 }
 
+func DeleteStickerBynameHander(msg string) (string, error) {
+	msgs := strings.Split(msg, " ")
+	if len(msgs) == 2 {
+		_, err := models.DeleteStrikerByName(database.DB, msgs[1])
+		if err != nil {
+			log.Println("Error delete Sticker from database:", err)
+			return "", err
+		}
+	} else {
+		return "Format error.", nil
+	}
+	return "The sticker has been successfully delete from the database.", nil
+}
+
 func LoadCommands() {
 	CommandsMap = map[string]HandlerFunc{
 		"bard": Bard,
 		"p":    Prompt,
 		"add":  AddSticker,
 		"find": FindStickerByName,
+		"del":  DeleteStickerBynameHander,
 	}
 }

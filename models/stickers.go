@@ -31,12 +31,11 @@ func FindStickerByName(db *gorm.DB, name string) (Stickers, error) {
 	return sticker, nil
 }
 
-func deleteStrikerByName(db *gorm.DB, name string) error {
+func DeleteStrikerByName(db *gorm.DB, name string) (string, error) {
 	result := db.Where("name = ?", name).Delete(&Stickers{})
 	if result.Error != nil {
-		return result.Error
+		return "", result.Error
 	}
 
-	return nil
-
+	return "", nil
 }
