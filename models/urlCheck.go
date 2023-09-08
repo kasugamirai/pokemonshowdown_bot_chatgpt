@@ -1,23 +1,34 @@
 package models
 
-import "net/url"
+import (
+	"net/url"
+	"regexp"
+)
 
-// URLCheck if URL is valid
+// URLCheck checks if the given string contains a valid URL
 func URLCheck(str string) bool {
-	u, err := url.Parse(str)
-	if err != nil {
-		return false
-	}
+	// Regular expression for identifying possible URL fragments
+	urlRegexp := regexp.MustCompile(`https?://[^\s]+|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}`)
 
-	// check if has scheme（suck as http, https）
-	if u.Scheme == "" {
-		return false
-	}
+	// Find all instances that might be URLs in the string
+	matches := urlRegexp.FindAllString(str, -1)
 
-	// check if it has host
-	if u.Host == "" {
-		return false
+	for _, match := range matches {
+		if isValidURL(match) {
+			return true
+		} else {
+			// Try prepending "https://" to incomplete URLs
+			withHTTP := "https://" + match
+			if isValidURL(withHTTP) {
+				return true
+			}
+		}
 	}
+	return false
+}
 
-	return true
+// isValidURL checks if a given string is a valid URL
+func isValidURL(u string) bool {
+	parsedURL, err := url.Parse(u)
+	return err == nil && parsedURL.Scheme != "" && parsedURL.Host != ""
 }
